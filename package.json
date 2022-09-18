@@ -1,0 +1,22 @@
+{
+  "name": "special-invention",
+  "version": "1.0.0",
+  "description": "a special invention for an assignment",
+  "main": "index.js",
+  "scripts": {
+    "devStart": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JDReeves86/special-invention.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JDReeves86/special-invention/issues"
+  },
+  "homepage": "https://github.com/JDReeves86/special-invention#readme",
+  "dependencies": {
+    "inquirer": "^8.2.4"
+  }
+}
