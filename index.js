@@ -1,6 +1,10 @@
-const inquirer = require('inquirer')
+const inquirer = require('inquirer');
+const mysql = require('mysql2');
+const cTable = require('console.table');
+const modules = require('./modules/modules.js');
+const dbConnection = require('./modules/connect.js');
 
-const questions =[
+const questions = [
     {
         type: 'list',
         message: 'Please make a selection. I want to..',
@@ -24,13 +28,24 @@ const questions =[
         }
     },
     {
-        type: 'input',
+        type: 'list',
         message: 'What is the Employees role?',
         name: 'empRole',
+        choices: modules.getJobTitles,
         when(response) {
             return response.select === 'add an employee'
         }
+        // HOW DO I POPULATE THE SELECT OPTIONS WITH THE EXISTING DB ROLES????!! 
     },
+    // {
+    //     type: 'input',
+    //     message: 'What is the Employees role?',
+    //     name: 'empRole',
+    //     when(response) {
+    //         return response.select === 'add an employee'
+    //     }
+    //     // HOW DO I POPULATE THE SELECT OPTIONS WITH THE EXISTING DB ROLES????!! 
+    // },
     {
         type: 'input',
         message: 'Who is the Employees Manager?',
@@ -38,6 +53,7 @@ const questions =[
         when(response) {
             return response.select === 'add an employee'
         }
+        // HOW DO I ASSOCIATE A NAME WITH AN EMP_ID??
     },
     {
         type: 'input',
@@ -56,9 +72,10 @@ const questions =[
         }
     },
     {
-        type: 'input',
+        type: 'list',
         message: 'What department does this role belong to?',
         name: 'roleDept',
+        choices: modules.getDeptNames,
         when(response) {
             return response.select === 'add a role'
         }
@@ -76,13 +93,65 @@ const questions =[
 function init() {
     return inquirer.prompt(questions)
         .then((response) => {
-            if (response.select === 'quit') {
-                console.log("I'll miss you.")
-            }
-            else {
-                init()
+            switch (response.select) {
+                case 'quit':
+                    console.log("I'll miss you.")
+                    break;
+                case 'view all departments':
+                    modules.queryDept().then(([results]) => {
+                        console.table(results)
+                    });
+                    init();
+                    break;
+                case 'view all roles':
+                    modules.queryRoles().then(([results]) => {
+                        console.table(results)
+                    });
+                    init();
+                    break;
+                case 'view all employees':
+                    modules.queryEmployees().then(([results]) => {
+                        console.table(results);
+                    });
+                    init();
+                    break;
+                case 'update an employee':
+                    // need to query employee table to select and then edit their info... lol wut
+                    console.log('update EMP');
+                    // need to build inq questions for this??
+                    break;
+                default:
+            };
+            if (response.deptName) {
+                dbConnection.query('INSERT INTO departments (dept_name) VALUES (?)', response.deptName, (err, results) => {
+                    if (err) {throw err}
+                });
+                init();
+                console.log('Department Added')
+            };
+            if (response.roleDept) {
+                console.log('here')
+                // query dept table fselect id from departments where dept_name == response.roledept <-- place into variable and place into insert statement
+                // dbConnection.query(stuff above).then(stuff below)
+                dbConnection.query('INSERT INTO roles (job_title, dept_id, salary) VALUES (?, ?, ?)', response.roleTitle, response.dept_id, response.roleSal)
+                .then((err) => {
+                    if (err) {throw err}
+                    else {console.log('role added')}
+                });
+                console.log('why not')
+                init();
+            };
+            if (response.empManager) {
+                // Need to pull dept_id and 
+                // dbConnection.query('INSERT INTO employees (first_name, last_name, role_id, dept_id, manager) VALUES (?, ?, ?, ?, ?)', response.firstName, response.lastName, response.empRole, response.DEPARTMENT>?? response.empManager function (err, results) {
+                //     console.log('Employee added!');
+                // });
+                init();
             };
     });
 };
 
 init()
+
+// HOW TO WE EDIT AN EXISTING TABLE IN SQL??
+
