@@ -35,17 +35,7 @@ const questions = [
         when(response) {
             return response.select === 'add an employee'
         }
-        // HOW DO I POPULATE THE SELECT OPTIONS WITH THE EXISTING DB ROLES????!! 
     },
-    // {
-    //     type: 'input',
-    //     message: 'What is the Employees role?',
-    //     name: 'empRole',
-    //     when(response) {
-    //         return response.select === 'add an employee'
-    //     }
-    //     // HOW DO I POPULATE THE SELECT OPTIONS WITH THE EXISTING DB ROLES????!! 
-    // },
     {
         type: 'input',
         message: 'Who is the Employees Manager?',
@@ -130,15 +120,16 @@ function init() {
                 console.log('Department Added')
             };
             if (response.roleDept) {
-                console.log('here')
-                // query dept table fselect id from departments where dept_name == response.roledept <-- place into variable and place into insert statement
-                // dbConnection.query(stuff above).then(stuff below)
-                dbConnection.query('INSERT INTO roles (job_title, dept_id, salary) VALUES (?, ?, ?)', response.roleTitle, response.dept_id, response.roleSal)
-                .then((err) => {
-                    if (err) {throw err}
-                    else {console.log('role added')}
+                // const deptID = 
+                dbConnection.query('SELECT id FROM departments WHERE dept_name = dog grooming', [response.roleDept], (err, results) => {
+                    if (err) {console.log(err)}
+                    console.log('results')
                 });
-                console.log('why not')
+                // query dept table select id from departments where dept_name == response.roledept <-- place into variable and place into insert statement
+                // dbConnection.query(stuff above).then(stuff below)
+                // dbConnection.query('INSERT INTO roles (job_title, dept_id, salary) VALUES (?, ?, ?)', response.roleTitle, response.roleDept, response.roleSal, (err, results) => {
+                //     if (err) {throw err}
+                // });
                 init();
             };
             if (response.empManager) {
