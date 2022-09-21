@@ -120,9 +120,12 @@ function init() {
                 console.log('Department Added')
             };
             if (response.roleDept) {
+                // console.log('here I am')
                 // const deptID = 
-                dbConnection.query('SELECT id FROM departments WHERE dept_name = dog grooming', [response.roleDept], (err, results) => {
+                dbConnection.query('SELECT id FROM departments WHERE dept_name = ?', 
+                ['dog grooming']).then((err, results) => {
                     if (err) {console.log(err)}
+                    console.log(results)
                     console.log('results')
                 });
                 // query dept table select id from departments where dept_name == response.roledept <-- place into variable and place into insert statement
