@@ -4,12 +4,12 @@ SELECT
     employees.first_name, 
     employees.last_name, 
     roles.job_title, 
+    departments.dept_name,
     roles.salary,
-    departments.dept_name
 FROM employees
-JOIN departments
-ON employees.dept_id=departments.id
 JOIN roles
+ON employees.role_id=roles.id
+JOIN departments
 ON departments.id=roles.dept_id;
 
 --  view all roles

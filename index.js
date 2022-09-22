@@ -37,9 +37,10 @@ const questions = [
         }
     },
     {
-        type: 'input',
+        type: 'list',
         message: 'Who is the Employees Manager?',
         name: 'empManager',
+        choices: modules.getManagers,
         when(response) {
             return response.select === 'add an employee'
         }
@@ -80,6 +81,21 @@ const questions = [
     },
 ];
 
+const updateQuestions =[
+    {
+        type: 'list',
+        message: "Which employee's role would you like to edit?",
+        choices: modules.getEmployees,
+        name: 'pickEmp'
+    },
+    {
+        type: 'list',
+        message: 'What is the new role you wish to assign?',
+        choices: modules.getJobTitles,
+        name: 'newRole'
+    }
+]
+
 function init() {
     return inquirer.prompt(questions)
         .then((response) => {
@@ -91,21 +107,25 @@ function init() {
                     modules.queryDept().then(([results]) => {
                         console.table(results)
                     });
+
                     init();
                     break;
                 case 'view all roles':
                     modules.queryRoles().then(([results]) => {
                         console.table(results)
                     });
+
                     init();
                     break;
                 case 'view all employees':
                     modules.queryEmployees().then(([results]) => {
                         console.table(results);
                     });
+
                     init();
                     break;
                 case 'update an employee':
+                    updateEmployees();
                     // need to query employee table to select and then edit their info... lol wut
                     console.log('update EMP');
                     // need to build inq questions for this??
@@ -116,36 +136,87 @@ function init() {
                 dbConnection.query('INSERT INTO departments (dept_name) VALUES (?)', response.deptName, (err, results) => {
                     if (err) {throw err}
                 });
+
                 init();
-                console.log('Department Added')
+                console.log('Department added!');
             };
             if (response.roleDept) {
-                // console.log('here I am')
-                // const deptID = 
-                dbConnection.query('SELECT id FROM departments WHERE dept_name = ?', 
-                ['dog grooming']).then((err, results) => {
-                    if (err) {console.log(err)}
-                    console.log(results)
-                    console.log('results')
+                deptID = dbConnection.query('SELECT id FROM departments WHERE dept_name = ?', 
+                [response.roleDept])
+                .then(([results]) => {
+                    return results[0].id
                 });
-                // query dept table select id from departments where dept_name == response.roledept <-- place into variable and place into insert statement
-                // dbConnection.query(stuff above).then(stuff below)
-                // dbConnection.query('INSERT INTO roles (job_title, dept_id, salary) VALUES (?, ?, ?)', response.roleTitle, response.roleDept, response.roleSal, (err, results) => {
-                //     if (err) {throw err}
-                // });
+
+                const getID = async () => {
+                    const id = await deptID
+                    dbConnection.query('INSERT INTO roles (job_title, dept_id, salary) VALUES (?, ?, ?)', [response.roleTitle, id, response.roleSal], (err, results) => {
+                        if (err) {throw err}
+                    });
+                };
+
+                getID();                
                 init();
+                console.log('Role added!');
             };
             if (response.empManager) {
-                // Need to pull dept_id and 
-                // dbConnection.query('INSERT INTO employees (first_name, last_name, role_id, dept_id, manager) VALUES (?, ?, ?, ?, ?)', response.firstName, response.lastName, response.empRole, response.DEPARTMENT>?? response.empManager function (err, results) {
-                //     console.log('Employee added!');
-                // });
+
+                roleID = dbConnection.query('SELECT id FROM roles WHERE job_title = ?', 
+                [response.empRole])
+                .then(([results]) => {
+                    return results[0].id
+                });
+
+                deptID = dbConnection.query('SELECT dept_id FROM roles WHERE job_title = ?', 
+                [response.empRole])
+                .then(([results]) => {
+                    return results[0].dept_id
+                });
+
+                const managerName = response.empManager.split(' ')[0]
+
+                managerID = dbConnection.query('SELECT id FROM employees WHERE first_name = ?', 
+                [managerName])
+                .then(([results]) => {
+                    return results[0].id
+                });
+
+                const getID = async () => {
+                    const promisedRoleID = await roleID;
+                    const promisedDeptID = await deptID;
+                    const promisedManagerID = await managerID;
+                    dbConnection.query('INSERT INTO employees (first_name, last_name, role_id, dept_id, manager) VALUES (?, ?, ?, ?, ?)', [response.firstName, response.lastName, promisedRoleID, promisedDeptID, promisedManagerID], (err, results) => {
+                        if (err) {throw err}
+                    });
+                };
+
+                getID();
                 init();
+                console.log('Employee added!');
             };
     });
 };
 
-init()
+function updateEmployees() {
+    return inquirer.prompt(updateQuestions)
+        .then((response) => {
+            roleID = dbConnection.query('SELECT id FROM roles WHERE job_title = ?', 
+            [response.newRole])
+            .then(([results]) => {
+                return results[0].id
+            });
 
-// HOW TO WE EDIT AN EXISTING TABLE IN SQL??
+            const empName = response.pickEmp.split(' ')[0];
+
+            const getID = async () => {
+                const promisedRoleID = await roleID;
+                dbConnection.query('UPDATE employees SET role_id = ? WHERE first_name = ?', [promisedRoleID, empName], (err, results) => {
+                    if (err) throw err
+                })
+            }
+            getID();
+            init();
+    })
+};
+
+init()
 
