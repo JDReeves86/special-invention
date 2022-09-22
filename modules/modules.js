@@ -53,6 +53,20 @@ const queryEmployees = () => {
     return dbConnection.query('SELECT employees.id, employees.first_name, employees.last_name, roles.job_title, departments.dept_name, roles.salary FROM employees JOIN roles ON employees.role_id=roles.id JOIN departments ON departments.id=roles.dept_id;')
 };
 
+// const getID = async (query, staticParam1, staticParam2, ...args) => {
+//     console.log(args)
+//     argArr =[];
+//     argArr.push(staticParam1, staticParam2);
+//     for (arg of args) {
+//         await arg
+//         queryArr.push(arg)
+//     }
+
+//     dbConnection.query(query, argArr, (err, results) => {
+//         if (err) {throw err}
+//     });
+// };
+
 module.exports = {
     getJobTitles,
     getDeptNames,
@@ -61,4 +75,5 @@ module.exports = {
     queryEmployees,
     getManagers,
     getEmployees,
+    // getID,
 }

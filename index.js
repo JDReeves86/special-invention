@@ -8,15 +8,16 @@ const questions = [
     {
         type: 'list',
         message: 'Please make a selection. I want to..',
-        choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee', 'quit'],
-        name: 'select'
+        choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee', 'Quit'],
+        name: 'select',
+        loop: false
     },
     {
         type: 'input',
         message: 'What is the Employees first name?',
         name: 'firstName',
         when(response) {
-            return response.select === 'add an employee'
+            return response.select === 'Add an employee'
         }
     },
     {
@@ -24,25 +25,27 @@ const questions = [
         message: 'What is the Employees last name?',
         name: 'lastName',
         when(response) {
-            return response.select === 'add an employee'
+            return response.select === 'Add an employee'
         }
     },
     {
         type: 'list',
         message: 'What is the Employees role?',
         name: 'empRole',
+        loop: false,
         choices: modules.getJobTitles,
         when(response) {
-            return response.select === 'add an employee'
+            return response.select === 'Add an employee'
         }
     },
     {
         type: 'list',
         message: 'Who is the Employees Manager?',
         name: 'empManager',
+        loop: false,
         choices: modules.getManagers,
         when(response) {
-            return response.select === 'add an employee'
+            return response.select === 'Add an employee'
         }
         // HOW DO I ASSOCIATE A NAME WITH AN EMP_ID??
     },
@@ -51,7 +54,7 @@ const questions = [
         message: 'What is the role title?',
         name: 'roleTitle',
         when(response) {
-            return response.select === 'add a role'
+            return response.select === 'Add a role'
         }
     },
     {
@@ -59,16 +62,17 @@ const questions = [
         message: 'What is the salary for this role?',
         name: 'roleSal',
         when(response) {
-            return response.select === 'add a role'
+            return response.select === 'Add a role'
         }
     },
     {
         type: 'list',
         message: 'What department does this role belong to?',
         name: 'roleDept',
+        loop: false,
         choices: modules.getDeptNames,
         when(response) {
-            return response.select === 'add a role'
+            return response.select === 'Add a role'
         }
     },
     {
@@ -76,7 +80,7 @@ const questions = [
         message: 'What is the name of the Department?',
         name: 'deptName',
         when(response) {
-            return response.select === 'add a department'
+            return response.select === 'Add a department'
         }
     },
 ];
@@ -100,31 +104,31 @@ function init() {
     return inquirer.prompt(questions)
         .then((response) => {
             switch (response.select) {
-                case 'quit':
+                case 'Quit':
                     console.log("I'll miss you.")
                     break;
-                case 'view all departments':
+                case 'View all departments':
                     modules.queryDept().then(([results]) => {
                         console.table(results)
                     });
 
                     init();
                     break;
-                case 'view all roles':
+                case 'View all roles':
                     modules.queryRoles().then(([results]) => {
                         console.table(results)
                     });
 
                     init();
                     break;
-                case 'view all employees':
+                case 'View all employees':
                     modules.queryEmployees().then(([results]) => {
                         console.table(results);
                     });
 
                     init();
                     break;
-                case 'update an employee':
+                case 'Update an employee':
                     updateEmployees();
                     // need to query employee table to select and then edit their info... lol wut
                     console.log('update EMP');
