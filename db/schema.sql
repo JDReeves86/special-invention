@@ -52,5 +52,5 @@ INSERT INTO employees (first_name, last_name, role_id, dept_id, manager)
     VALUES
         ('James', 'Bond', 10, 1, 100),
         ('Mad', 'Max', 10, 1, 100),
-        -- ('Han', 'Solo', 11, 2, 102),
-        -- ('John', 'Connor', 11, 2, 102);
+        ('Han', 'Solo', 11, 2, 102),
+        ('John', 'Connor', 11, 2, 102);

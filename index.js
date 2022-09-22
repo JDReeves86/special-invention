@@ -1,8 +1,8 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
-const cTable = require('console.table');
 const modules = require('./modules/modules.js');
 const dbConnection = require('./modules/connect.js');
+const { printTable } = require('console-table-printer')
 
 const questions = [
     {
@@ -106,33 +106,33 @@ function init() {
             switch (response.select) {
                 case 'Quit':
                     console.log("I'll miss you.")
-                    break;
+                    process.exit();
                 case 'View all departments':
                     modules.queryDept().then(([results]) => {
-                        console.table(results)
+                        console.log('\n')
+                        printTable(results)
                     });
 
                     init();
                     break;
                 case 'View all roles':
                     modules.queryRoles().then(([results]) => {
-                        console.table(results)
+                        console.log('\n')
+                        printTable(results)
                     });
 
                     init();
                     break;
                 case 'View all employees':
                     modules.queryEmployees().then(([results]) => {
-                        console.table(results);
+                        console.log('\n')
+                        printTable(results);
                     });
 
                     init();
                     break;
                 case 'Update an employee':
                     updateEmployees();
-                    // need to query employee table to select and then edit their info... lol wut
-                    console.log('update EMP');
-                    // need to build inq questions for this??
                     break;
                 default:
             };
