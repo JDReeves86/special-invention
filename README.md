@@ -94,7 +94,7 @@ N/A
 <br>
 
 
-Link to Github repo: https://github.com/JDReeves86/miniature-robot
+Link to Github repo: https://github.com/JDReeves86/special-invention
 
 Link to video walkthrough: https://drive.google.com/file/d/1VG9U4CiRbt8wQgsrA2YeODYcZHciyq0W/view
 
