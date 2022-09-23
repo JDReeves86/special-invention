@@ -8,7 +8,7 @@ const questions = [
     {
         type: 'list',
         message: 'Please make a selection. I want to..',
-        choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee', 'Quit'],
+        choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee', 'Remove items', 'Quit'],
         name: 'select',
         loop: false
     },
@@ -85,19 +85,86 @@ const questions = [
     },
 ];
 
-const updateQuestions =[
+const updateQuestions = [
+    {
+        type: 'list',
+        message: 'What would you like to edit?',
+        choices: ['Employee role', "Employee's Manager"],
+        name: 'decisions'
+    },
+    {
+        type: 'list',
+        message: "Which employee's manager would you like to edit?",
+        choices: modules.getEmployees,
+        name: 'pickEmpMan',
+        when(response) {
+            return response.decisions === "Employee's Manager"
+        }
+    },
+    {
+        type: 'list',
+        message: 'Who is the new manager?',
+        choices: modules.getEmployees,
+        name: 'newMan',
+        when(response) {
+            return response.decisions === "Employee's Manager"
+        }
+    },
     {
         type: 'list',
         message: "Which employee's role would you like to edit?",
         choices: modules.getEmployees,
-        name: 'pickEmp'
+        name: 'pickEmp',
+        when(response) {
+            return response.decisions === 'Employee role'
+        }
     },
     {
         type: 'list',
         message: 'What is the new role you wish to assign?',
         choices: modules.getJobTitles,
-        name: 'newRole'
+        name: 'newRole',
+        when(response) {
+            return response.decisions === 'Employee role'
+        }
     }
+];
+
+const deleteQuestions = [
+    {
+        type: 'list',
+        message: 'What would you like to remove?',
+        choices: ['Employee'],
+        name: 'delete'
+    },
+    {
+        type: 'list',
+        message: "Which employee would you like to remove?",
+        choices: modules.getEmployees,
+        name: 'fired',
+        when(response) {
+            return response.delete === "Employee"
+        }
+    },
+    // {
+    //     type: 'list',
+    //     message: "Which department would you like to remove?",
+    //     choices: modules.getDeptNames,
+    //     name: 'dissolved',
+    //     when(response) {
+    //         return response.delete === "Department"
+    //     }
+    // },
+    // {
+    //     type: 'list',
+    //     message: "Which role would you like to remove?",
+    //     choices: modules.getJobTitles,
+    //     name: 'layoff',
+    //     when(response) {
+    //         return response.delete === "Role"
+    //     }
+    // },
+
 ]
 
 function init() {
@@ -133,6 +200,9 @@ function init() {
                     break;
                 case 'Update an employee':
                     updateEmployees();
+                    break;
+                case 'Remove items':
+                    deleteStuff();
                     break;
                 default:
             };
@@ -203,24 +273,83 @@ function init() {
 function updateEmployees() {
     return inquirer.prompt(updateQuestions)
         .then((response) => {
-            roleID = dbConnection.query('SELECT id FROM roles WHERE job_title = ?', 
-            [response.newRole])
-            .then(([results]) => {
-                return results[0].id
-            });
-
-            const empName = response.pickEmp.split(' ')[0];
-
-            const getID = async () => {
-                const promisedRoleID = await roleID;
-                dbConnection.query('UPDATE employees SET role_id = ? WHERE first_name = ?', [promisedRoleID, empName], (err, results) => {
-                    if (err) throw err
-                })
+            if (response.newRole) {
+                roleID = dbConnection.query('SELECT id FROM roles WHERE job_title = ?', 
+                [response.newRole])
+                .then(([results]) => {
+                    return results[0].id
+                });
+    
+                const empName = response.pickEmp.split(' ')[0];
+    
+                const getID = async () => {
+                    const promisedRoleID = await roleID;
+                    dbConnection.query('UPDATE employees SET role_id = ? WHERE first_name = ?', [promisedRoleID, empName], (err, results) => {
+                        if (err) throw err
+                    })
+                }
+                getID();
+                init();
             }
-            getID();
-            init();
+            if (response.newMan) {
+                const managerName = response.newMan.split(' ')[0];
+                const empName = response.pickEmpMan.split(' ')[0];
+
+                managerID = dbConnection.query('SELECT id FROM employees WHERE first_name = ?', 
+                [managerName])
+                .then(([results]) => {
+                    return results[0].id
+                });
+
+                const getID = async () => {
+                    const promisedManID = await managerID;
+                    dbConnection.query('UPDATE employees SET manager = ? WHERE first_name = ?', [promisedManID, empName], (err, results) => {
+                        if (err) throw err
+                    })
+                }
+                getID();
+                init();
+
+            }
+
     })
 };
 
-init()
+function deleteStuff() {
+    return inquirer.prompt(deleteQuestions)
+    .then((response) => {
+        console.log(response)
+        if (response.fired) {
+            const empName = response.fired.split(' ')[0];
+       
+            dbConnection.query('DELETE FROM employees WHERE first_name = ?', [empName])
+
+            init();
+        };
+
+        // VV  DOESN'T WORK BECAUSE FOPREIGN KEY CONSTRAINT FAILS??? TF DOES THAT MEAN?
+       
+        // if (response.dissolved) {
+        //     console.log('dept removed')
+        //     dbConnection.query('DELETE FROM departments WHERE dept_name = ?', [response.dissolved], (err, results) => {
+        //         if (err) throw err
+        //     })
+        //     init();
+        // }
+
+
+        // if (response.layoff) {
+       
+        //     dbConnection.query('DELETE FROM roles WHERE job_title = ?', [response.layoff], (err, results) => {
+        //             if (err) throw err
+        //             })
+
+        //     init();
+        //     }
+        // ^^ ALL THIS STUFF NO WORKIE...
+
+    })
+};
+
+init();
 

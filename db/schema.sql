@@ -40,17 +40,22 @@ ALTER TABLE employees AUTO_INCREMENT=100;
 
 INSERT INTO departments (dept_name)
     VALUES 
-        ('Accounting'),
-        ('Sales');
+        ('Law Enforcement'),
+        ('War Mongering');
 
 INSERT INTO roles (job_title, dept_id, salary)
     VALUES
-        ('Accountant', 1, 80000),
-        ('Sales Person', 2, 100000);
+        ('Vigilante', 1, 80000),
+        ('Chieftan', 2, 100000),
+        ('Warrior of the Wastes', 2, 500000),
+        ('Enforcer', 2, 5000);
 
 INSERT INTO employees (first_name, last_name, role_id, dept_id, manager)
     VALUES
-        ('James', 'Bond', 10, 1, 100),
-        ('Mad', 'Max', 10, 1, 100),
-        ('Han', 'Solo', 11, 2, 102),
-        ('John', 'Connor', 11, 2, 102);
+        ('Max', 'Rockatansky', 10, 1, 100),
+        ('Toe', 'Cutter', 11, 2, 101),
+        ('Lord', 'Humungus', 12, 2, 102),
+        ('Auntie', 'Entity', 11, 2, 103),
+        ('Master', 'Blaster', 13, 2, 103),
+        ('Immortan', 'Joe', 11, 2, 105),
+        ('Imperator', 'Furiosa', 10, 1, 106);
